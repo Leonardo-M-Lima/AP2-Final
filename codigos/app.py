@@ -4,16 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np 
-
-import pandas as pd
-import streamlit as st
-import os # Certifique-se de que 'os' está importado no início do seu app.py
-import numpy as np # Certifique-se de que 'numpy' está importado para np.inf, np.nan
-
-import pandas as pd
-import streamlit as st
-import os # Certifique-se de que 'os' está importado no início do seu app.py
-import numpy as np # Certifique-se de que 'numpy' está importado para np.inf, np.nan
+import os # Adicione esta linha se ainda não tiver
 
 @st.cache_data
 def load_data():
@@ -23,34 +14,37 @@ def load_data():
     Converte colunas relevantes para tipos numéricos e trata possíveis erros.
     """
     try:
-        # Pega o diretório do arquivo Python atual (app.py)
-        current_dir = os.path.dirname(__file__)
+        # Caminho relativo correto: sai de AP2-Final (..) e entra em bases_tratadas
+        csv_file_path = '../bases_tratadas/dados_tratados.csv' 
 
-        # Constrói o caminho para o arquivo CSV de forma robusta
-        # Agora, 'bases_tratadas' está dentro do mesmo diretório que 'app.py' (AP2-Final)
-        csv_file_path = os.path.join(current_dir, 'bases_tratadas', 'dados_tratados.csv')
+        # --- OU, a versão robusta com os.path.join, que também resolve para esse caso: ---
+        # current_dir = os.path.dirname(__file__)
+        # csv_file_path = os.path.join(current_dir, '..', 'bases_tratadas', 'dados_tratados.csv')
+        # ---------------------------------------------------------------------------------
 
         df = pd.read_csv(csv_file_path, sep=';', encoding='UTF-8', index_col=0)
         return df
     except FileNotFoundError:
-        st.error(f"Arquivo '{csv_file_path}' não encontrado. "
+        st.error(f"Arquivo '{csv_file_path}' não encontrado. " # Use f-string para mostrar o caminho
                  "Verifique o caminho ou se a Parte 1 do script foi executada e o arquivo foi salvo corretamente.")
-        return pd.DataFrame() # Retorna um DataFrame vazio em caso de erro
+        # Para evitar erros subsequentes no Streamlit, retorne um DataFrame vazio
+        # e interrompa a execução da aplicação principal se os dados forem essenciais
+        st.stop() # Adicionar st.stop() é uma boa prática aqui
     except Exception as e:
         st.error(f"Erro ao carregar os dados: {e}")
-        return pd.DataFrame() # Retorna um DataFrame vazio em caso de erro
+        st.stop() # Adicionar st.stop() aqui também
 
-    # Se a leitura for bem-sucedida, continua com o tratamento dos dados
-    if 'Volume (ML)' in df.columns:
-        df['Volume (ML)'] = pd.to_numeric(df['Volume (ML)'], errors='coerce').fillna(0).astype(int)
-    if 'Precos' in df.columns:
-        df['Precos'] = pd.to_numeric(df['Precos'], errors='coerce').fillna(0)
-    if 'Parcela' in df.columns:
-        df['Parcela'] = pd.to_numeric(df['Parcela'], errors='coerce').fillna(0).astype(int)
-    
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+# Carrega os dados fora do try-except, mas a função load_data já lida com isso
+df = load_data()
 
-    return df
+# O resto do seu código, que só deve rodar se df não for vazio
+if not df.empty:
+    # Seus gráficos e funcionalidades aqui
+    st.write("Dados carregados com sucesso!")
+    st.dataframe(df.head()) # Apenas para verificar
+    # ...
+else:
+    st.warning("Os dados não puderam ser carregados. Algumas funcionalidades da aplicação podem não estar disponíveis.")
 
 df = load_data()
 
