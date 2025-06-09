@@ -5,6 +5,11 @@ import pandas as pd
 import plotly.express as px
 import numpy as np 
 
+import pandas as pd
+import streamlit as st
+import os # Certifique-se de que 'os' está importado no início do seu app.py
+import numpy as np # Certifique-se de que 'numpy' está importado para np.inf, np.nan
+
 @st.cache_data
 def load_data():
     """
@@ -13,15 +18,25 @@ def load_data():
     Converte colunas relevantes para tipos numéricos e trata possíveis erros.
     """
     try:
-        df = pd.read_csv('../bases_tratadas/dados_tratados.csv', sep=';', encoding='UTF-8', index_col=0)
+        # Pega o diretório do arquivo Python atual (app.py)
+        current_dir = os.path.dirname(__file__)
+
+        # Constrói o caminho para o arquivo CSV de forma robusta
+        # Considerando que 'bases_tratadas' está um nível acima do 'AP2-Final'
+        # e que 'app.py' está dentro de 'AP2-Final'
+        csv_file_path = os.path.join(current_dir, '..', 'bases_tratadas', 'dados_tratados.csv')
+
+        df = pd.read_csv(csv_file_path, sep=';', encoding='UTF-8', index_col=0)
+        return df
     except FileNotFoundError:
-        st.error("Arquivo '../bases_tratadas/dados_tratados.csv' não encontrado. "
+        st.error(f"Arquivo '{csv_file_path}' não encontrado. "
                  "Verifique o caminho ou se a Parte 1 do script foi executada e o arquivo foi salvo corretamente.")
-        return pd.DataFrame()
+        return pd.DataFrame() # Retorna um DataFrame vazio em caso de erro
     except Exception as e:
         st.error(f"Erro ao carregar os dados: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame() # Retorna um DataFrame vazio em caso de erro
 
+    # Se a leitura for bem-sucedida, continua com o tratamento dos dados
     if 'Volume (ML)' in df.columns:
         df['Volume (ML)'] = pd.to_numeric(df['Volume (ML)'], errors='coerce').fillna(0).astype(int)
     if 'Precos' in df.columns:
