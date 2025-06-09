@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import plotly.express as px
-import os # Importar o módulo os
+import os
 
 @st.cache_data
 def load_data():
@@ -14,38 +14,26 @@ def load_data():
     Converte colunas relevantes para tipos numéricos e trata possíveis erros.
     """
     try:
-        # Pega o caminho absoluto do diretório onde 'app.py' está.
-        # Isso garante que o ponto de partida seja sempre o mesmo,
-        # independentemente de onde você executa o 'streamlit run'.
         base_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # Constrói o caminho para o arquivo CSV.
-        # base_dir é '.../seu_repositorio/codigos'
-        # Queremos ir para '.../seu_repositorio/bases_tratadas/dados_tratados.csv'
-        # Então: de 'codigos', subimos um nível (..) para a raiz do repositório,
-        # e então entramos em 'bases_tratadas'.
         csv_file_path = os.path.join(base_dir, '..', 'bases_tratadas', 'dados_tratados.csv')
 
-        st.write(f"Tentando carregar dados de: {csv_file_path}") # Linha para depuração!
+        st.write(f"Tentando carregar dados de: {csv_file_path}")
 
         df = pd.read_csv(csv_file_path, sep=';', encoding='UTF-8', index_col=0)
         return df
     except FileNotFoundError:
         st.error(f"Arquivo '{csv_file_path}' não encontrado. "
                  "Verifique o caminho ou se a Parte 1 do script foi executada e o arquivo foi salvo corretamente.")
-        st.stop() # Interrompe a execução para evitar outros erros
+        st.stop()
     except Exception as e:
         st.error(f"Erro ao carregar os dados: {e}")
-        st.stop() # Interrompe a execução
+        st.stop()
 
-# Carregar os dados
 df = load_data()
 
-# O restante do seu código Streamlit aqui
 if not df.empty:
     st.write("Dados carregados com sucesso!")
-    st.dataframe(df.head()) # Mostra o cabeçalho do DataFrame para confirmar
-    # ... (seu código para gráficos, etc.)
+    st.dataframe(df.head())
 else:
     st.warning("Os dados não puderam ser carregados. Algumas funcionalidades da aplicação podem não estar disponíveis.")
 
