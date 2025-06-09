@@ -10,6 +10,11 @@ import streamlit as st
 import os # Certifique-se de que 'os' está importado no início do seu app.py
 import numpy as np # Certifique-se de que 'numpy' está importado para np.inf, np.nan
 
+import pandas as pd
+import streamlit as st
+import os # Certifique-se de que 'os' está importado no início do seu app.py
+import numpy as np # Certifique-se de que 'numpy' está importado para np.inf, np.nan
+
 @st.cache_data
 def load_data():
     """
@@ -22,9 +27,8 @@ def load_data():
         current_dir = os.path.dirname(__file__)
 
         # Constrói o caminho para o arquivo CSV de forma robusta
-        # Considerando que 'bases_tratadas' está um nível acima do 'AP2-Final'
-        # e que 'app.py' está dentro de 'AP2-Final'
-        csv_file_path = os.path.join(current_dir, '..', 'bases_tratadas', 'dados_tratados.csv')
+        # Agora, 'bases_tratadas' está dentro do mesmo diretório que 'app.py' (AP2-Final)
+        csv_file_path = os.path.join(current_dir, 'bases_tratadas', 'dados_tratados.csv')
 
         df = pd.read_csv(csv_file_path, sep=';', encoding='UTF-8', index_col=0)
         return df
